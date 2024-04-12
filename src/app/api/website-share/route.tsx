@@ -12,6 +12,15 @@ const byteValueNumberFormatter = Intl.NumberFormat("fr", {
 })
 
 export async function GET(request: Request) {
+  // CORS all all
+  const headers = new Headers()
+  headers.set("Access-Control-Allow-Origin", "*")
+  headers.set("Access-Control-Allow-Methods", "GET")
+  headers.set("Content-Type", "image/png")
+
+  // header download image
+  headers.set("Content-Disposition", `attachment; filename="image.png"`)
+  
   const { searchParams } = new URL(request.url)
 
   const extraBold = await (
