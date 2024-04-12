@@ -1,8 +1,7 @@
 import { ImageResponse } from "next/og"
-// App router includes @vercel/og.
-// No need to install it.
+import sharp from "sharp"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 const byteValueNumberFormatter = Intl.NumberFormat("fr", {
   notation: "compact",
@@ -11,16 +10,19 @@ const byteValueNumberFormatter = Intl.NumberFormat("fr", {
   unitDisplay: "narrow",
 })
 
+function resizeImageFromArrayBuffer(inputArrayBuffer: ArrayBuffer, width: number, height: number): Promise<Buffer> {
+  return sharp(Buffer.from(inputArrayBuffer)).resize(width, height).jpeg().toBuffer()
+}
+
 export async function GET(request: Request) {
   // CORS all all
   const headers = new Headers()
   headers.set("Access-Control-Allow-Origin", "*")
   headers.set("Access-Control-Allow-Methods", "GET")
-  headers.set("Content-Type", "image/png")
 
   // header download image
   headers.set("Content-Disposition", `attachment; filename="image.png"`)
-  
+
   const { searchParams } = new URL(request.url)
 
   const extraBold = await (
@@ -60,7 +62,7 @@ export async function GET(request: Request) {
           },
         ]
 
-  return new ImageResponse(
+  const imageResponse = await new ImageResponse(
     (
       <div
         style={{
@@ -170,4 +172,23 @@ export async function GET(request: Request) {
       ],
     }
   )
+
+  if (searchParams.get("preview")) {
+    const image = await imageResponse.arrayBuffer()
+
+    const result = await resizeImageFromArrayBuffer(image, 150, 150)
+    headers.set("Content-Type", "image/jpg")
+
+    return new Response(result, {
+      headers: {
+        ...headers,
+        "cache-control":
+          process.env.NODE_ENV === "development"
+            ? "no-cache, no-store"
+            : "public, immutable, no-transform, max-age=31536000",
+      },
+    })
+  } else {
+    return imageResponse
+  }
 }
