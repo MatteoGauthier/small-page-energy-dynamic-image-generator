@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     await fetch("https://smallpageenergy.mmibordeaux.com/fonts/CabinetGrotesk-Black.ttf")
   ).arrayBuffer()
 
-  const brand = searchParams.get("brand") || "Small Page Energy"
+  const brand = searchParams.get("brand") || "Nike"
 
   const rank = Number(searchParams.get("rank")) || 324
   const weightValue = Number(searchParams.get("weight")) || 2_000_000
