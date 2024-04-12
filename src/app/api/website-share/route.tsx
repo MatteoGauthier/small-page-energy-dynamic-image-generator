@@ -11,7 +11,7 @@ const byteValueNumberFormatter = Intl.NumberFormat("fr", {
 })
 
 function resizeImageFromArrayBuffer(inputArrayBuffer: ArrayBuffer, width: number, height: number): Promise<Buffer> {
-  return sharp(Buffer.from(inputArrayBuffer)).resize(width, height).jpeg().toBuffer()
+  return sharp(Buffer.from(inputArrayBuffer)).resize(width, height).webp().toBuffer()
 }
 
 export async function GET(request: Request) {
@@ -176,7 +176,7 @@ export async function GET(request: Request) {
   if (searchParams.has("preview")) {
     const image = await imageResponse.arrayBuffer()
 
-    const result = await resizeImageFromArrayBuffer(image, 150, 150)
+    const result = await resizeImageFromArrayBuffer(image, 250, 250)
     headers.set("Content-Type", "image/jpg")
 
     return new Response(result, {
