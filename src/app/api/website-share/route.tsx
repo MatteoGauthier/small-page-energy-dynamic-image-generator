@@ -4,7 +4,16 @@ import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
 
-export async function GET() {
+const byteValueNumberFormatter = Intl.NumberFormat("fr", {
+  notation: "compact",
+  style: "unit",
+  unit: "byte",
+  unitDisplay: "narrow",
+})
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+
   const extraBold = await (
     await fetch("https://smallpageenergy.mmibordeaux.com/fonts/CabinetGrotesk-Extrabold.ttf")
   ).arrayBuffer()
@@ -12,21 +21,12 @@ export async function GET() {
     await fetch("https://smallpageenergy.mmibordeaux.com/fonts/CabinetGrotesk-Black.ttf")
   ).arrayBuffer()
 
-  const byteValueNumberFormatter = Intl.NumberFormat("fr", {
-    notation: "compact",
-    style: "unit",
-    unit: "byte",
-    unitDisplay: "narrow",
-  })
+  const brand = searchParams.get("brand") || "Small Page Energy"
 
-  const brand = "Nike"
+  const rank = Number(searchParams.get("rank")) || 324
+  const weightValue = Number(searchParams.get("weight")) || 2_000_000
+  const weight = byteValueNumberFormatter.format(weightValue)
 
-  const rank = 455
-  const weight = byteValueNumberFormatter.format(2_000_000)
-
-  const categoryName = "Mode & Luxe"
-
-  const categoryRank = 2
   const fontBlack = {
     fontFamily: "Black",
   }
@@ -34,20 +34,22 @@ export async function GET() {
     fontFamily: "ExtraBold",
   }
 
-  const categoriesRanks = [
-    {
-      name: "Mode & Luxe",
-      rank: 2,
-    },
-    {
-      name: "High-Tech",
-      rank: 1,
-    },
-    // {
-    //   name: "Maison & Jardin",
-    //   rank: 3,
-    // },
-  ]
+  const categoriesRanks: {
+    name: string
+    rank: number
+  }[] =
+    searchParams.get("categoriesRanks") && typeof searchParams.get("categoriesRanks") == "string"
+      ? JSON.parse(searchParams.get("categoriesRanks") as string)
+      : [
+          {
+            name: "Mode & Luxe",
+            rank: 2,
+          },
+          {
+            name: "High-Tech",
+            rank: 1,
+          },
+        ]
 
   return new ImageResponse(
     (
@@ -69,9 +71,9 @@ export async function GET() {
           style={{
             position: "absolute",
             bottom: "60%",
-            left: "11.5%",
-
-            width: 400,
+            left: 154 - 25 * 4.5,
+            height: 500,
+            width: 400 + 50 * 4.5,
           }}
           tw="flex items-center flex-col justify-center"
         >
@@ -144,7 +146,7 @@ export async function GET() {
     {
       width: 1350,
       height: 1350,
-      // debug: true,
+      debug: true,
       fonts: [
         {
           data: extraBold,
