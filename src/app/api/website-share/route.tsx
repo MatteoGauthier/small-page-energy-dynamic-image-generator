@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 import sharp from "sharp"
 
-// export const runtime = "edge"
+export const runtime = "nodejs"
 
 const byteValueNumberFormatter = Intl.NumberFormat("fr", {
   notation: "compact",
@@ -173,7 +173,7 @@ export async function GET(request: Request) {
     }
   )
 
-  if (searchParams.get("preview")) {
+  if (searchParams.has("preview")) {
     const image = await imageResponse.arrayBuffer()
 
     const result = await resizeImageFromArrayBuffer(image, 150, 150)
