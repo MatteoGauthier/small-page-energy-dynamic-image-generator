@@ -146,7 +146,7 @@ export async function GET(request: Request) {
     {
       width: 1350,
       height: 1350,
-      debug: true,
+      debug: false,
       fonts: [
         {
           data: extraBold,
